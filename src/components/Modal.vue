@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showModal">
+  <div v-show="showModal">
     <div class="custom-modal">
       <div class="page-title">
         <h3>Курсы</h3>

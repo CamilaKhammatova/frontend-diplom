@@ -5,90 +5,78 @@
     </div>
     <table class="striped centered">
       <thead>
-        <tr>
-            <th v-for="(header, index) in headers"
-                :key=index>
-              {{ header }}
-            </th>
-        </tr>
+      <tr>
+        <th v-for="(header, index) in headers"
+            :key=index>
+          {{ header }}
+        </th>
+      </tr>
       </thead>
 
       <tbody>
-        <tr v-for="row, index in tableData" :key="index">
-          <td v-for="item, index in row" :key="index">{{ item }}</td>
-        </tr>
+      <tr v-for="row, index in tableData" :key="index">
+        <td v-for="item, index in row" :key="index">{{ item }}</td>
+      </tr>
       </tbody>
     </table>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data: () => ({
     headers: [
       'Предмет',
       'Преподаватель',
-      'Время начала',
-      'Адрес',
-      'Номер аудитории',
+      'Дата',
+      'Время',
+      'Адрес и номер аудитории',
     ],
-    tableData: [
-      {
-        subject: 'Мат.Анал',
-        name: 'Иванов Василий',
-        time: '10:00',
-        adress: 'Кузнецова 3а',
-        audience: 103
-      },
-      {
-        subject: 'Дис.Мат',
-        name: 'Иванов Василий',
-        time: '11:50',
-        adress: 'Кузнецова 3а',
-        audience: 111
-      },
-      {
-        subject: 'Лин.Алгебра',
-        name: 'Иванов Василий',
-        time: '13:30',
-        adress: 'Кузнецова 3а',
-        audience: 201
-      },
-      {
-        subject: 'Основы програм.',
-        name: 'Иванов Василий',
-        time: '15:10',
-        adress: 'Кузнецова 3а',
-        audience: 103
-      },
-      {
-        subject: 'Архитектура приложений',
-        name: 'Иванов Василий',
-        time: '17:00',
-        adress: 'Кузнецова 3а',
-        audience: 513
-      },
-      {
-        subject: 'Мат.Анал',
-        name: 'Иванов Василий',
-        time: '18:40',
-        adress: 'Кузнецова 3а',
-        audience: 201
-      },
-    ],
+    tableData: [],
   }),
   methods: {
-    checkUser() {
-      if (localStorage.email == 'teacher@kpfu.ru') {
-        this.tableData.map(el => {
-          delete el.name
-        })
-        this.headers.splice(1, 1)
+    getStudentData() {
+      var studentId = this.$route.params.id
+
+      axios.get(`http://localhost:8080/api/v1/lessons/student/${studentId}`)
+        .then(response => {
+          this.tableData = response.data
+          this.sortTable()
+        });
+    },
+    sortTable() {
+      this.tableData.sort((a, b) => {
+        let aDate = new Date(a.date).getTime()
+        let bDate = new Date(b.date).getTime()
+
+        if (aDate === bDate) {
+          return a.time.localeCompare(b.time)
+        }
+
+        return aDate > bDate ? 1 : -1
+      })
+    },
+    getTeacherData() {
+      var teacherId = this.$route.params.id
+
+      axios.get(`http://localhost:8080/api/v1/lessons/teacher/${teacherId}`)
+        .then(response => {
+          this.tableData = response.data
+          this.sortTable()
+        });
+    },
+    getData() {
+      if (this.$route.name === 'teacher_schedule') {
+        this.getTeacherData();
+      } else {
+        this.getStudentData();
       }
     }
   },
   mounted() {
-    this.checkUser();
+    this.getData();
   }
 }
 </script>

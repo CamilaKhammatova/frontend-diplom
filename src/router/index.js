@@ -32,14 +32,26 @@ const routes = [
     component: () => import('../views/Register.vue')
   },
   {
-    path: '/profile',
+    path: '/profile/:id',
     name: 'profile',
     meta: {layout: 'main'},
     component: () => import('../views/Profile.vue')
   },
   {
-    path: '/schedule',
+    path: '/teacher/profile/:id',
+    name: 'teacher_profile',
+    meta: {layout: 'main'},
+    component: () => import('../views/Profile.vue')
+  },
+  {
+    path: '/schedule/:id',
     name: 'schedule',
+    meta: {layout: 'main'},
+    component: () => import('../views/Schedule.vue')
+  },
+  {
+    path: '/teacher/schedule/:id',
+    name: 'teacher_schedule',
     meta: {layout: 'main'},
     component: () => import('../views/Schedule.vue')
   },

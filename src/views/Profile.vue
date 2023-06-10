@@ -77,66 +77,84 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data: () => ({
     name: '',
     faculty: '',
     department: '',
+    email: '',
     headers: [
       'Предмет',
     ],
-    tableData: [
-      {
-        subject: 'Мат.Анал',
-      },
-      {
-        subject: 'Дис.Мат',
-      },
-      {
-        subject: 'Лин.Алгебра',
-      },
-      {
-        subject: 'Основы програм.',
-      },
-      {
-        subject: 'Архитектура приложений',
-      },
-      {
-        subject: 'Мат.Анал',
-      },
-      {
-        subject: 'Мат.Анал',
-      },
-    ],
+    tableData: [],
   }),
   computed: {
-    email() {
-      return localStorage.email;
-    }
+
+  },
+  directory() {
+    const module = this.$siteMap.find(route => route.name === this.$route.params.id);
+    return {
+      title: module.meta?.label,
+      items: module.children,
+    };
   },
   methods: {
-    checkData() {
-      if (localStorage.email == 'teacher@kpfu.ru') {
-        this.name = 'Геннадьев Василий Иванович',
-        this.department = 'ИТИС',
-        this.headers.push('Количество записавшихся на курс'),
-        this.tableData.map(el => {
-          el.count = Math.floor(Math.random() * 60)
-        })
+    getStudentData() {
+      this.headers.push('Преподаватель')
+
+      var studentId = this.$route.params.id
+
+      axios.get('http://localhost:8080/api/v1/students/' + studentId)
+        .then(response => {
+          this.name = response.data.fio
+          this.email = response.data.email
+          this.faculty = 'Программная инженерия'
+        });
+
+      axios.get('http://localhost:8080/api/v1/teachers')
+        .then(response => {
+          response.data.forEach(teacher => {
+            this.tableData.push({
+              subject: teacher.subjectName,
+              name: teacher.fio
+            })
+          })
+        });
+    },
+    getTeacherData() {
+      this.headers.push('Количество студентов')
+
+      var teacherId = this.$route.params.id
+
+      axios.get(`http://localhost:8080/api/v1/teachers/${teacherId}`)
+        .then(response => {
+          this.name = response.data.fio
+          this.email = response.data.email
+          this.faculty = 'Программная инженерия'
+        });
+
+      axios.get(`http://localhost:8080/api/v1/lessons/teacher/${teacherId}/count`)
+        .then(response => {
+          response.data.forEach(data => {
+            this.tableData.push({
+              subject: data.subject,
+              name: data.count
+            })
+          })
+        });
+    },
+    getData() {
+      if (this.$route.name === "teacher_profile") {
+        this.getTeacherData();
       } else {
-        this.name = 'Васильев Иван Геннадьевич',
-        this.faculty = 'Программная инженерия',
-        this.headers.push('Преподаватель'),
-        this.tableData.map(el => {
-          el.name = 'Иванов Василий'
-        })
+        this.getStudentData();
       }
-      const fio = this.name.split(' ')
-      this.$store.state.userName = fio[0]+' '+fio[1][0]+'.'+fio[2][0];
     }
   },
   mounted() {
-    this.checkData();
+    this.getData();
   }
 }
 </script>

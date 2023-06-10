@@ -80,16 +80,16 @@ export default {
   },
   methods: {
     submitHandler() {
-      if (this.$v.$invalid) {
-        this.$v.$touch()
-        return
-      }
-      const formData = {
-        email: this.email,
-        password: this.password
-      }
-      localStorage.email = this.email;
-      this.$router.push('/profile');
+      // if (this.$v.$invalid) {
+      //   this.$v.$touch()
+      //   return
+      // }
+      // const formData = {
+      //   email: this.email,
+      //   password: this.password
+      // }
+      // localStorage.email = this.email;
+      this.$router.push('/profile/1');
     }
   },
   mounted() {

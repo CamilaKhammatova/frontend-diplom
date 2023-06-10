@@ -68,10 +68,6 @@ export default {
     ],
     tableData: [
       {
-        subject: 'Мат.Анал',
-        name: 'Иванов Василий',
-      },
-      {
         subject: 'Дис.Мат',
         name: 'Иванов Василий',
       },
